@@ -4,7 +4,7 @@
   "description": "A simple way to display data on a table.",
   "author": "NicholasMata",
   "license": "MIT",
-  "repository": "MataDesigns/PagedTable",
+  "repository": "NicholasMata/ReactTable",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
