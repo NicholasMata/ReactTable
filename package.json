@@ -1,6 +1,6 @@
 {
   "name": "paged-table",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple way to display data on a table.",
   "author": "NicholasMata",
   "license": "MIT",
@@ -66,5 +66,14 @@
     "dist"
   ],
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
+    "@fortawesome/fontawesome-pro": "^5.7.2",
+    "@fortawesome/pro-solid-svg-icons": "^5.7.2",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "bootstrap": "^4.2.1",
+    "prop-types": "^15.5.4",
+    "react": "^15.0.0 || ^16.0.0",
+    "react-bootstrap": "1.0.0-beta.5",
+    "react-dom": "^15.0.0 || ^16.0.0"
   }
 }
