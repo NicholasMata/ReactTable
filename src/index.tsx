@@ -5,7 +5,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css'
 import * as React from 'react'
-import { Table, Row, Container, ButtonToolbar } from 'react-bootstrap';
+import { Table, Row, Col, Container, ButtonToolbar } from 'react-bootstrap';
 
 import PageButtonGroup from './PageButtonGroup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -93,7 +93,7 @@ export default class SimpleTable extends React.Component<Props, State> {
     }
     let sortMap = this.state.sorting;
     let sortDirection = sortMap.get(key);
-    if(sortDirection == null) {
+    if (sortDirection == null) {
       sortMap = new Map<string, SortDirection>()
       sortMap.set(key, SortDirection.up)
     } else {
@@ -109,69 +109,77 @@ export default class SimpleTable extends React.Component<Props, State> {
     const dataset = this.getDataSet()
     const numberOfPages = this.numberOfPages()
     return (
-      <Container>
+      <Container fluid={true}>
         <Row>
-          {"Showing "}
-          <select onChange={this.onPageSizeChange}>
-            {this.props.pagingOptions.sizes.map((size) => {
-              return (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              );
-            })}
-          </select>
-          {" entries"}
+
+          <Col md={12}>
+            {"Showing "}
+            <select onChange={this.onPageSizeChange}>
+              {this.props.pagingOptions.sizes.map((size) => {
+                return (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                );
+              })}
+            </select>
+            {" entries"}
+          </Col>
         </Row>
         <Row>
-          <Table bordered={true} responsive={true}>
-            <thead>
-              <tr>
-                {this.props.columns.map(column => {
-                  const sortDirection = this.state.sorting.get(column.key);
-                  
-                  column.sort = column.sort || true
-                  let showSort = column.sort
-                  if(sortDirection == undefined) {
-                    showSort = false
-                  }
-                  return <th className="clickableColumn"
-                    key={column.key}
-                    onClick={() => { this.onColumnClicked(column.key, column.sort) }}>
-                    {column.displayName}
-                    &nbsp;{showSort && 
-                      (sortDirection == SortDirection.up ? 
-                      <FontAwesomeIcon icon={faSortUp}/> : <FontAwesomeIcon icon={faSortDown}/>)}
-                  </th>
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {dataset.map((rowObj: any) => {
-                if (rowObj == null) {
-                  return null
-                }
-                return <tr key={rowObj[this.props.idKey]}>
+          <Col md={12}>
+            <Table bordered={true} responsive={true}>
+              <thead>
+                <tr>
                   {this.props.columns.map(column => {
-                    let columnData = rowObj[column.key];
-                    if (columnData instanceof Function) {
-                      columnData = rowObj[column.key]()
+                    const sortDirection = this.state.sorting.get(column.key);
+
+                    column.sort = column.sort || true
+                    let showSort = column.sort
+                    if (sortDirection == undefined) {
+                      showSort = false
                     }
-                    return <td style={{ width: column.width }} key={column.key}>{columnData}</td>;
+                    return <th className="clickableColumn"
+                      key={column.key}
+                      onClick={() => { this.onColumnClicked(column.key, column.sort) }}>
+                      {column.displayName}
+                      &nbsp;{showSort &&
+                        (sortDirection == SortDirection.up ?
+                          <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />)}
+                    </th>
                   })}
                 </tr>
-              })}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {dataset.map((rowObj: any) => {
+                  if (rowObj == null) {
+                    return null
+                  }
+                  return <tr key={rowObj[this.props.idKey]}>
+                    {this.props.columns.map(column => {
+                      let columnData = rowObj[column.key];
+                      if (columnData instanceof Function) {
+                        columnData = rowObj[column.key]()
+                      }
+                      return <td style={{ width: column.width }} key={column.key}>{columnData}</td>;
+                    })}
+                  </tr>
+                })}
+              </tbody>
+            </Table>
+          </Col>
         </Row>
         <Row className="float-right">
-          <ButtonToolbar>
-            <PageButtonGroup
-              currentPage={this.state.currentPage}
-              maxButtonCount={5}
-              pageCount={numberOfPages}
-              onChange={this.onPageChange} />
-          </ButtonToolbar>
+
+          <Col md={12}>
+            <ButtonToolbar>
+              <PageButtonGroup
+                currentPage={this.state.currentPage}
+                maxButtonCount={5}
+                pageCount={numberOfPages}
+                onChange={this.onPageChange} />
+            </ButtonToolbar>
+          </Col>
         </Row>
       </Container>
     )
