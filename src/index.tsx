@@ -28,7 +28,7 @@ export interface Props {
   columns: ColumnDefintion[],
   data: any, idKey: string,
   pagingOptions: PagingOptions
-  onSortChange: (key: string) => {}
+  onSortChange: (key: string, sortBy: SortDirection) => {}
 }
 export interface State {
   currentPage: number
@@ -102,7 +102,7 @@ export default class SimpleTable extends React.Component<Props, State> {
     this.setState({
       sorting: sortMap
     })
-    this.props.onSortChange(key)
+    this.props.onSortChange(key, sortMap.get(key) || SortDirection.up)
   }
 
   render() {

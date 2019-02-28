@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SimpleTable from 'paged-table'
+import SimpleTable, { SortDirection } from 'paged-table'
 
 class User {
   enabled = false
@@ -28,7 +28,7 @@ export default class App extends Component {
       c.width = 100 / this.columns.length + "%"
       return c
     })
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 20; i++) {
       let user = new User(i, "Test " + i)
       user.component = <div>
         <button onClick={() => { user.enabled = !user.enabled; this.forceUpdate() }}>
@@ -43,9 +43,22 @@ export default class App extends Component {
       <div>
         <button onClick={() => { this.columns.pop(); this.forceUpdate(); }}>Remove Last Column</button>
         <SimpleTable idKey="id"
-          onSortChange={(key) => {
-            this.data.sort((a, b)=> {return a < b})
-            // console.log("Sorting By key")
+          onSortChange={(key, direction) => {
+            console.log("Sorting by", key, direction)
+            this.data = this.data.sort((a, b) => {
+              let aValue = a[key]
+              let bValue = b[key]
+              if (direction == SortDirection.down) {
+                aValue = b[key]
+                bValue = a[key]
+              }
+              if (aValue < bValue)
+                return -1;
+              if (aValue > bValue)
+                return 1;
+              return 0;
+            })
+            this.forceUpdate();
           }}
           columns={this.columns}
           data={this.data}
