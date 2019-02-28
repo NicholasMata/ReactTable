@@ -43,7 +43,7 @@ export default class PageButtonGroup extends Component<Props, State> {
     }
 
     render() {
-        const buttonCount = this.props.maxButtonCount
+        let buttonCount = this.props.maxButtonCount
         const currentPage = this.state.currentPage
         const pageCount = this.props.pageCount
         const firstHalf = Math.round(buttonCount / 2) - 1
@@ -51,6 +51,13 @@ export default class PageButtonGroup extends Component<Props, State> {
         if (pageCount - start < buttonCount) {
             start = pageCount - buttonCount
         }
+        if (start < 0) {
+            start = 0;
+        }
+        if (buttonCount > pageCount) {
+            buttonCount = pageCount;
+        }
+        console.log(start, "Starting at")
         const pages = Array
             .apply(null, { length: buttonCount })
             .map(function (this: number, _: number, i: number) {
