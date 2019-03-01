@@ -9,7 +9,6 @@ class User {
   }
 
   status() {
-    // console.log("THIS", this)
     return this.enabled ? "true" : "false"
   }
 }
@@ -19,7 +18,10 @@ export default class App extends Component {
   columns = [{ key: "id", displayName: "User Id" },
   { key: "name", displayName: "Name" },
   { key: "status", displayName: "Status" },
-  { key: "component", displayName: "Change Status" }]
+  { key: "component", displayName: "Change Status" },
+  { key: "date", displayName: "Date Test", formatter: (value) => {
+    return value.toLocaleString()
+  } }]
 
   constructor(props) {
     super(props)
@@ -30,6 +32,7 @@ export default class App extends Component {
     })
     for (let i = 0; i < 20; i++) {
       let user = new User(i, "Test " + i)
+      user.date = new Date();
       user.component = <div>
         <button onClick={() => { user.enabled = !user.enabled; this.forceUpdate() }}>
           Change Status
@@ -48,7 +51,7 @@ export default class App extends Component {
             this.data = this.data.sort((a, b) => {
               let aValue = a[key]
               let bValue = b[key]
-              if (direction == SortDirection.down) {
+              if (direction == SortDirection.descending) {
                 aValue = b[key]
                 bValue = a[key]
               }

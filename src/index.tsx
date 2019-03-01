@@ -12,21 +12,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortUp, faSortDown } from '@fortawesome/pro-solid-svg-icons';
 
 export enum SortDirection {
-  up, down
+  ascending, descending
 }
 
 export interface ColumnDefintion {
-  key: string,
+  key: string
   displayName: string
+  formatter?: (value: any) => any
   width: string
-  sort: boolean
+  sortable: boolean
+  sorter: (value: any) => number
 }
 export interface PagingOptions {
   sizes: number[]
 }
 export interface Props {
-  columns: ColumnDefintion[],
-  data: any, idKey: string,
+  columns: ColumnDefintion[]
+  data: any
+  idKey: string
   pagingOptions: PagingOptions
   onSortChange: (key: string, sortBy: SortDirection) => {}
 }
@@ -86,6 +89,10 @@ export default class SimpleTable extends React.Component<Props, State> {
     })
   }
 
+  componentDidUpdate() {
+
+  }
+
   onColumnClicked = (key: string, shouldSort: boolean) => {
     if (!shouldSort) {
       console.log("Not sorting", key, shouldSort)
@@ -95,14 +102,14 @@ export default class SimpleTable extends React.Component<Props, State> {
     let sortDirection = sortMap.get(key);
     if (sortDirection == null) {
       sortMap = new Map<string, SortDirection>()
-      sortMap.set(key, SortDirection.up)
+      sortMap.set(key, SortDirection.ascending)
     } else {
-      sortMap.set(key, sortDirection == SortDirection.up ? SortDirection.down : SortDirection.up)
+      sortMap.set(key, sortDirection == SortDirection.ascending ? SortDirection.descending : SortDirection.ascending)
     }
     this.setState({
       sorting: sortMap
     })
-    this.props.onSortChange(key, sortMap.get(key) || SortDirection.up)
+    this.props.onSortChange(key, sortMap.get(key) || SortDirection.ascending)
   }
 
   render() {
@@ -133,18 +140,17 @@ export default class SimpleTable extends React.Component<Props, State> {
                 <tr>
                   {this.props.columns.map(column => {
                     const sortDirection = this.state.sorting.get(column.key);
-
-                    column.sort = column.sort || true
-                    let showSort = column.sort
+                    column.sortable = column.sortable || true;
+                    let showSort = column.sortable;
                     if (sortDirection == undefined) {
-                      showSort = false
+                      showSort = false;
                     }
                     return <th className="clickableColumn"
                       key={column.key}
-                      onClick={() => { this.onColumnClicked(column.key, column.sort) }}>
+                      onClick={() => { this.onColumnClicked(column.key, column.sortable) }}>
                       {column.displayName}
-                      &nbsp;{showSort &&
-                        (sortDirection == SortDirection.up ?
+                      &nbsp;&nbsp;{showSort &&
+                        (sortDirection == SortDirection.ascending ?
                           <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />)}
                     </th>
                   })}
@@ -158,8 +164,14 @@ export default class SimpleTable extends React.Component<Props, State> {
                   return <tr key={rowObj[this.props.idKey]}>
                     {this.props.columns.map(column => {
                       let columnData = rowObj[column.key];
-                      if (columnData instanceof Function) {
-                        columnData = rowObj[column.key]()
+                      if (column.formatter) {
+                        columnData = column.formatter(columnData)
+                      } else {
+                        if (columnData instanceof Function) {
+                          columnData = rowObj[column.key]()
+                        } else if (columnData instanceof Date) {
+                          columnData = columnData.toString()
+                        }
                       }
                       return <td style={{ width: column.width }} key={column.key}>{columnData}</td>;
                     })}
