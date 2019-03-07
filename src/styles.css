@@ -3,3 +3,10 @@
 .clickableColumn {
   cursor: pointer;
 }
+
+tbody>tr.no-hover:hover {
+  background-color: #ffffff;
+}
+thead>tr.no-hover:hover {
+  background-color: #ffffff;
+}

@@ -23,23 +23,51 @@ export interface ColumnDefintion {
   sortable: boolean
   sorter: (value: any) => number
 }
+
+export interface RowDefinition {
+  below: number
+  component: JSX.Element
+}
+
 export interface PagingOptions {
   sizes: number[]
 }
 export interface Props {
   columns: ColumnDefintion[]
-  data: any
+  injectedRows?: RowDefinition[]
+  data: any[]
   idKey: string
   pagingOptions: PagingOptions
-  onSortChange: (key: string, sortBy: SortDirection) => {}
+  clickable: boolean
+  onSortChange?: (key: string, sortBy: SortDirection) => {}
+  onRowClicked?: (id: string | number) => {}
+
+  bordered: boolean
 }
 export interface State {
   currentPage: number
   currentPageSize: number
   sorting: Map<string, SortDirection>
 }
-export default class SimpleTable extends React.Component<Props, State> {
 
+export interface ManualRowProps {
+  colSpan: number
+}
+export class ManualRow extends React.Component<ManualRowProps> {
+  render() {
+    return <tr className="no-hover">
+      <td colSpan={this.props.colSpan}>
+        {this.props.children}
+      </td>
+    </tr>
+  }
+}
+export default class SimpleTable extends React.Component<Props, State> {
+  static defaultProps = {
+    idKey: "id",
+    clickable: false,
+    pagingOptions: { sizes: [10, 20, 30] }
+  }
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -109,7 +137,8 @@ export default class SimpleTable extends React.Component<Props, State> {
     this.setState({
       sorting: sortMap
     })
-    this.props.onSortChange(key, sortMap.get(key) || SortDirection.ascending)
+    // this.props.data = this.props.data.sort()
+    this.props.onSortChange && this.props.onSortChange(key, sortMap.get(key) || SortDirection.ascending)
   }
 
   render() {
@@ -117,8 +146,7 @@ export default class SimpleTable extends React.Component<Props, State> {
     const numberOfPages = this.numberOfPages()
     return (
       <Container fluid={true}>
-        <Row>
-
+        {numberOfPages > 1 && <Row>
           <Col md={12}>
             {"Showing "}
             <select onChange={this.onPageSizeChange}>
@@ -132,12 +160,12 @@ export default class SimpleTable extends React.Component<Props, State> {
             </select>
             {" entries"}
           </Col>
-        </Row>
+        </Row>}
         <Row>
           <Col md={12}>
-            <Table bordered={true} responsive={true}>
+            <Table bordered={this.props.bordered} responsive hover={this.props.clickable}>
               <thead>
-                <tr>
+                <tr className="no-hover">
                   {this.props.columns.map(column => {
                     const sortDirection = this.state.sorting.get(column.key);
                     column.sortable = column.sortable || true;
@@ -157,31 +185,36 @@ export default class SimpleTable extends React.Component<Props, State> {
                 </tr>
               </thead>
               <tbody>
-                {dataset.map((rowObj: any) => {
+                {dataset.map((rowObj: any, i: number) => {
                   if (rowObj == null) {
                     return null
                   }
-                  return <tr key={rowObj[this.props.idKey]}>
-                    {this.props.columns.map(column => {
-                      let columnData = rowObj[column.key];
-                      if (column.formatter) {
-                        columnData = column.formatter(columnData)
-                      } else {
-                        if (columnData instanceof Function) {
-                          columnData = rowObj[column.key]()
-                        } else if (columnData instanceof Date) {
-                          columnData = columnData.toString()
+                  const key = rowObj[this.props.idKey];
+                  return (<React.Fragment key={i}>
+                    {rowObj.injectAbove}
+                    <tr className={!this.props.clickable ? "no-hover": ""} key={key} onClick={() => (this.props.clickable && this.props.onRowClicked && this.props.onRowClicked(key))}>
+                      {this.props.columns.map(column => {
+                        let columnData = rowObj[column.key];
+                        if (column.formatter) {
+                          columnData = column.formatter(columnData)
+                        } else {
+                          if (columnData instanceof Function) {
+                            columnData = rowObj[column.key]()
+                          } else if (columnData instanceof Date) {
+                            columnData = columnData.toString()
+                          }
                         }
-                      }
-                      return <td style={{ width: column.width }} key={column.key}>{columnData}</td>;
-                    })}
-                  </tr>
+                        return <td style={{ width: column.width }} key={column.key}>{columnData}</td>;
+                      })}
+                    </tr>
+                    {rowObj.injectBelow}
+                  </React.Fragment>)
                 })}
               </tbody>
             </Table>
           </Col>
         </Row>
-        <Row className="float-right">
+        {numberOfPages > 1 && <Row className="float-right">
 
           <Col md={12}>
             <ButtonToolbar>
@@ -192,7 +225,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                 onChange={this.onPageChange} />
             </ButtonToolbar>
           </Col>
-        </Row>
+        </Row>}
       </Container>
     )
   }

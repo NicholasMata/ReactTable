@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SimpleTable, { SortDirection } from 'paged-table'
+import SimpleTable, { SortDirection, ManualRow } from 'paged-table'
 
 class User {
   enabled = false
@@ -19,9 +19,11 @@ export default class App extends Component {
   { key: "name", displayName: "Name" },
   { key: "status", displayName: "Status" },
   { key: "component", displayName: "Change Status" },
-  { key: "date", displayName: "Date Test", formatter: (value) => {
-    return value.toLocaleString()
-  } }]
+  {
+    key: "date", displayName: "Date Test", formatter: (value) => {
+      return value.toLocaleString()
+    }
+  }]
 
   constructor(props) {
     super(props)
@@ -34,7 +36,11 @@ export default class App extends Component {
       let user = new User(i, "Test " + i)
       user.date = new Date();
       user.component = <div>
-        <button onClick={() => { user.enabled = !user.enabled; this.forceUpdate() }}>
+        <button onClick={(e) => {
+          e.stopPropagation();
+          user.enabled = !user.enabled;
+          this.forceUpdate()
+        }}>
           Change Status
         </button>
       </div>
@@ -45,27 +51,25 @@ export default class App extends Component {
     return (
       <div>
         <button onClick={() => { this.columns.pop(); this.forceUpdate(); }}>Remove Last Column</button>
-        <SimpleTable idKey="id"
-          onSortChange={(key, direction) => {
-            console.log("Sorting by", key, direction)
-            this.data = this.data.sort((a, b) => {
-              let aValue = a[key]
-              let bValue = b[key]
-              if (direction == SortDirection.descending) {
-                aValue = b[key]
-                bValue = a[key]
-              }
-              if (aValue < bValue)
-                return -1;
-              if (aValue > bValue)
-                return 1;
-              return 0;
-            })
-            this.forceUpdate();
+        <SimpleTable
+          clickable
+          bordered
+          onRowClicked={(id) => {
+            const user = this.data.find((r) => r.id == id);
+            if (user.injectBelow == null) {
+              user.injectBelow = <ManualRow colSpan={this.columns.length}>
+                <SimpleTable
+                clickable
+                  columns={[{ key: "name", displayName: "Name" }]}
+                  data={[{ name: "Nick" }, { name: "Arwen" }]} />
+              </ManualRow>;
+            } else {
+              user.injectBelow = null;
+            }
+            this.forceUpdate()
           }}
           columns={this.columns}
-          data={this.data}
-          pagingOptions={{ sizes: [10, 20, 30] }} />
+          data={this.data} />
       </div>
     )
   }
