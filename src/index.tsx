@@ -18,7 +18,7 @@ export enum SortDirection {
 export interface ColumnDefintion {
   key: string
   displayName: string
-  formatter?: (value: any) => any
+  formatter?: (value: any, row: any) => any
   width: string
   sortable: boolean
   sorter: (value: any) => number
@@ -199,7 +199,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                       {this.props.columns.map(column => {
                         let columnData = rowObj[column.key];
                         if (column.formatter) {
-                          columnData = column.formatter(columnData)
+                          columnData = column.formatter(columnData, rowObj)
                         } else {
                           if (columnData instanceof Function) {
                             columnData = rowObj[column.key]()
