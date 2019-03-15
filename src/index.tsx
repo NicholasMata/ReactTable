@@ -22,6 +22,8 @@ export interface ColumnDefintion {
   width: string
   sortable: boolean
   sorter: (value: any) => number
+  headerStyle: any,
+  cellStyle: any 
 }
 
 export interface RowDefinition {
@@ -175,6 +177,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                     }
                     return <th className="clickableColumn"
                       key={column.key}
+                      style={{ ...column.headerStyle }}
                       onClick={() => { this.onColumnClicked(column.key, column.sortable) }}>
                       {column.displayName}
                       &nbsp;&nbsp;{showSort &&
@@ -204,7 +207,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                             columnData = columnData.toString()
                           }
                         }
-                        return <td style={{ width: column.width }} key={column.key}>{columnData}</td>;
+                        return <td style={{ ...column.cellStyle }} key={column.key}>{columnData}</td>;
                       })}
                     </tr>
                     {rowObj.injectBelow}

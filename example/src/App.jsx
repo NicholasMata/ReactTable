@@ -15,7 +15,7 @@ class User {
 
 
 export default class App extends Component {
-  columns = [{ key: "id", displayName: "User Id" },
+  columns = [{ key: "id", displayName: "User Id", headerStyle: { width: '100px' } },
   { key: "name", displayName: "Name" },
   { key: "status", displayName: "Status" },
   { key: "component", displayName: "Change Status" },
@@ -29,7 +29,9 @@ export default class App extends Component {
     super(props)
     this.data = []
     this.columns = this.columns.map(c => {
-      c.width = 100 / this.columns.length + "%"
+      if (c.width == null) {
+        // c.width = 100 / this.columns.length + "%"
+      }
       return c
     })
     for (let i = 0; i < 20; i++) {
@@ -59,7 +61,7 @@ export default class App extends Component {
             if (user.injectBelow == null) {
               user.injectBelow = <ManualRow colSpan={this.columns.length}>
                 <SimpleTable
-                clickable
+                  clickable
                   columns={[{ key: "name", displayName: "Name" }]}
                   data={[{ name: "Nick" }, { name: "Arwen" }]} />
               </ManualRow>;
