@@ -173,7 +173,7 @@ export default class SimpleTable extends React.Component<Props, State> {
         {rowObj.injectBelow}
       </React.Fragment>)
     });
-    if(tableBody.length == 0) {
+    if (tableBody.length == 0) {
       tableBody.push(this.props.noDataElement)
     }
     return (
@@ -213,9 +213,11 @@ export default class SimpleTable extends React.Component<Props, State> {
                       style={{ ...column.headerStyle }}
                       onClick={() => { this.onColumnClicked(column.key, column.sortable) }}>
                       {column.displayName}
-                      &nbsp;&nbsp;{showSort &&
-                        (sortDirection == SortDirection.ascending ?
-                          <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />)}
+                      {showSort &&
+                        (<React.Fragment>
+                          <span>&nbsp;&nbsp;</span>
+                          (sortDirection == SortDirection.ascending ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />)
+                          </React.Fragment>)}
                     </th>
                   })}
                 </tr>
