@@ -43,8 +43,8 @@ export interface Props {
   clickable: boolean
   onSortChange?: (key: string, sortBy: SortDirection) => {}
   onRowClicked?: (id: string | number) => {}
-
   bordered: boolean
+  noDataElement: JSX.Element
 }
 export interface State {
   currentPage: number
@@ -54,11 +54,12 @@ export interface State {
 
 export interface ManualRowProps {
   colSpan: number
+  style: any
 }
 export class ManualRow extends React.Component<ManualRowProps> {
   render() {
     return <tr className="no-hover">
-      <td colSpan={this.props.colSpan}>
+      <td style={this.props.style} colSpan={this.props.colSpan}>
         {this.props.children}
       </td>
     </tr>
@@ -146,6 +147,35 @@ export default class SimpleTable extends React.Component<Props, State> {
   render() {
     const dataset = this.getDataSet()
     const numberOfPages = this.numberOfPages()
+
+    var tableBody = dataset.map((rowObj: any, i: number) => {
+      if (rowObj == null) {
+        return null
+      }
+      const key = rowObj[this.props.idKey];
+      return (<React.Fragment key={i}>
+        {rowObj.injectAbove}
+        <tr className={!this.props.clickable ? "no-hover" : ""} key={key} onClick={() => (this.props.clickable && this.props.onRowClicked && this.props.onRowClicked(key))}>
+          {this.props.columns.map(column => {
+            let columnData = rowObj[column.key];
+            if (column.formatter) {
+              columnData = column.formatter(columnData, rowObj)
+            } else {
+              if (columnData instanceof Function) {
+                columnData = rowObj[column.key]()
+              } else if (columnData instanceof Date) {
+                columnData = columnData.toString()
+              }
+            }
+            return <td style={{ ...column.cellStyle }} key={column.key}>{columnData}</td>;
+          })}
+        </tr>
+        {rowObj.injectBelow}
+      </React.Fragment>)
+    });
+    if(tableBody.length == 0) {
+      tableBody.push(this.props.noDataElement)
+    }
     return (
       <Container fluid={true}>
         {numberOfPages > 1 && <Row>
@@ -191,31 +221,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                 </tr>
               </thead>
               <tbody>
-                {dataset.map((rowObj: any, i: number) => {
-                  if (rowObj == null) {
-                    return null
-                  }
-                  const key = rowObj[this.props.idKey];
-                  return (<React.Fragment key={i}>
-                    {rowObj.injectAbove}
-                    <tr className={!this.props.clickable ? "no-hover" : ""} key={key} onClick={() => (this.props.clickable && this.props.onRowClicked && this.props.onRowClicked(key))}>
-                      {this.props.columns.map(column => {
-                        let columnData = rowObj[column.key];
-                        if (column.formatter) {
-                          columnData = column.formatter(columnData, rowObj)
-                        } else {
-                          if (columnData instanceof Function) {
-                            columnData = rowObj[column.key]()
-                          } else if (columnData instanceof Date) {
-                            columnData = columnData.toString()
-                          }
-                        }
-                        return <td style={{ ...column.cellStyle }} key={column.key}>{columnData}</td>;
-                      })}
-                    </tr>
-                    {rowObj.injectBelow}
-                  </React.Fragment>)
-                })}
+                {tableBody}
               </tbody>
             </Table>
           </Col>

@@ -50,6 +50,7 @@ export default class App extends Component {
     }
   }
   render() {
+    let noDataElement = <ManualRow colSpan={this.columns.length} style={{textAlign: 'center', backgroundColor: 'whitesmoke'}}><b>No Data</b></ManualRow>;
     return (
       <div>
         <button onClick={() => { this.columns.pop(); this.forceUpdate(); }}>Remove Last Column</button>
@@ -71,7 +72,8 @@ export default class App extends Component {
             this.forceUpdate()
           }}
           columns={this.columns}
-          data={this.data} />
+          data={[]}
+          noDataElement={noDataElement} />
       </div>
     )
   }
