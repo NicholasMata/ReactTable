@@ -23,7 +23,7 @@ export interface ColumnDefintion {
   sortable: boolean
   sorter: (value: any) => number
   headerStyle: any,
-  cellStyle: any 
+  cellStyle: any
 }
 
 export interface RowDefinition {
@@ -170,12 +170,15 @@ export default class SimpleTable extends React.Component<Props, State> {
                 <tr className="no-hover">
                   {this.props.columns.map(column => {
                     const sortDirection = this.state.sorting.get(column.key);
-                    column.sortable = column.sortable || true;
+                    column.sortable = column.sortable
+                    if (column.sortable == null) {
+                      column.sortable = true
+                    }
                     let showSort = column.sortable;
                     if (sortDirection == undefined) {
                       showSort = false;
                     }
-                    return <th className="clickableColumn"
+                    return <th className={column.sortable ? "clickableColumn" : ""}
                       key={column.key}
                       style={{ ...column.headerStyle }}
                       onClick={() => { this.onColumnClicked(column.key, column.sortable) }}>
@@ -195,7 +198,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                   const key = rowObj[this.props.idKey];
                   return (<React.Fragment key={i}>
                     {rowObj.injectAbove}
-                    <tr className={!this.props.clickable ? "no-hover": ""} key={key} onClick={() => (this.props.clickable && this.props.onRowClicked && this.props.onRowClicked(key))}>
+                    <tr className={!this.props.clickable ? "no-hover" : ""} key={key} onClick={() => (this.props.clickable && this.props.onRowClicked && this.props.onRowClicked(key))}>
                       {this.props.columns.map(column => {
                         let columnData = rowObj[column.key];
                         if (column.formatter) {
