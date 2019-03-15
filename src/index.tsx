@@ -214,10 +214,10 @@ export default class SimpleTable extends React.Component<Props, State> {
                       onClick={() => { this.onColumnClicked(column.key, column.sortable) }}>
                       {column.displayName}
                       {showSort &&
-                        (<React.Fragment>
+                        <React.Fragment>
                           <span>&nbsp;&nbsp;</span>
-                          (sortDirection == SortDirection.ascending ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />)
-                          </React.Fragment>)}
+                          {sortDirection == SortDirection.ascending ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />}
+                          </React.Fragment>}
                     </th>
                   })}
                 </tr>

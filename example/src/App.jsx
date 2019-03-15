@@ -15,7 +15,7 @@ class User {
 
 
 export default class App extends Component {
-  columns = [{ key: "id", displayName: "User Id", headerStyle: { width: '100px' }, sortable: false },
+  columns = [{ key: "id", displayName: "User Id", headerStyle: { width: '10px' }, sortable: false },
   { key: "name", displayName: "Name" },
   { key: "status", displayName: "Status" },
   { key: "component", displayName: "Change Status" },
