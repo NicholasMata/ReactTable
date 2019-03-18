@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SimpleTable, { SortDirection, ManualRow } from 'paged-table'
+import SimpleTable, { ManualRow, ManualCol } from 'paged-table'
 
 class User {
   enabled = false
@@ -50,7 +50,7 @@ export default class App extends Component {
     }
   }
   render() {
-    let noDataElement = <ManualRow colSpan={this.columns.length} style={{textAlign: 'center', backgroundColor: 'whitesmoke'}}><b>No Data</b></ManualRow>;
+    let noDataElement = <ManualRow colSpan={this.columns.length} style={{ textAlign: 'center', backgroundColor: 'whitesmoke' }}><b>No Data</b></ManualRow>;
     return (
       <div>
         <button onClick={() => { this.columns.pop(); this.forceUpdate(); }}>Remove Last Column</button>
@@ -60,11 +60,13 @@ export default class App extends Component {
           onRowClicked={(id) => {
             const user = this.data.find((r) => r.id == id);
             if (user.injectBelow == null) {
-              user.injectBelow = <ManualRow colSpan={this.columns.length}>
-                <SimpleTable
-                  clickable
-                  columns={[{ key: "name", displayName: "Name" }]}
-                  data={[{ name: "Nick" }, { name: "Arwen" }]} />
+              user.injectBelow = <ManualRow>
+                <ManualCol colSpan={this.columns.length}>
+                  <SimpleTable
+                    clickable
+                    columns={[{ key: "name", displayName: "Name" }]}
+                    data={[{ name: "Nick" }, { name: "Arwen" }]} />
+                </ManualCol>
               </ManualRow>;
             } else {
               user.injectBelow = null;
@@ -72,8 +74,17 @@ export default class App extends Component {
             this.forceUpdate()
           }}
           columns={this.columns}
-          data={[]}
-          noDataElement={noDataElement} />
+          data={this.data}
+          noDataElement={noDataElement} >
+          <ManualRow style={{lineHeight: '1px'}}>
+            <ManualCol colSpan={2} style={{ textAlign: 'center'}}>
+              User
+            </ManualCol>
+            <ManualCol colSpan={3} style={{ textAlign: 'center' }}>
+              Group
+            </ManualCol>
+          </ManualRow>
+        </SimpleTable>
       </div>
     )
   }

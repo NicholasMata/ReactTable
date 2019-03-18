@@ -26,17 +26,11 @@ export interface ColumnDefintion {
   cellStyle: any
 }
 
-export interface RowDefinition {
-  below: number
-  component: JSX.Element
-}
-
 export interface PagingOptions {
   sizes: number[]
 }
 export interface Props {
   columns: ColumnDefintion[]
-  injectedRows?: RowDefinition[]
   data: any[]
   idKey: string
   pagingOptions: PagingOptions
@@ -52,19 +46,22 @@ export interface State {
   sorting: Map<string, SortDirection>
 }
 
-export interface ManualRowProps {
-  colSpan: number
-  style: any
-}
-export class ManualRow extends React.Component<ManualRowProps> {
+export class ManualRow extends React.Component<any> {
   render() {
-    return <tr className="no-hover">
-      <td style={this.props.style} colSpan={this.props.colSpan}>
-        {this.props.children}
-      </td>
+    return <tr {... this.props} >
+      {this.props.children}
     </tr>
   }
 }
+
+export class ManualCol extends React.Component<any> {
+  render() {
+    return <td {... this.props} >
+      {this.props.children}
+    </td>
+  }
+}
+
 export default class SimpleTable extends React.Component<Props, State> {
   static defaultProps = {
     idKey: "id",
@@ -217,12 +214,13 @@ export default class SimpleTable extends React.Component<Props, State> {
                         <React.Fragment>
                           <span>&nbsp;&nbsp;</span>
                           {sortDirection == SortDirection.ascending ? <FontAwesomeIcon icon={faSortUp} /> : <FontAwesomeIcon icon={faSortDown} />}
-                          </React.Fragment>}
+                        </React.Fragment>}
                     </th>
                   })}
                 </tr>
               </thead>
               <tbody>
+                {this.props.children}
                 {tableBody}
               </tbody>
             </Table>
