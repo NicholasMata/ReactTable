@@ -6,8 +6,8 @@
 
 
 ## Whats possible
-![](sample_images/basic.png)
-![](sample_images/advanced.png)
+![](sample_images/Basic.png)
+![](sample_images/Advanced.png)
 
 ## Install
 
