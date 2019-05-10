@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faChevronDoubleRight, faChevronLeft, faChevronDoubleLeft } from '@fortawesome/pro-solid-svg-icons'
+import { faChevronRight, faStepForward, faChevronLeft, faStepBackward } from '@fortawesome/free-solid-svg-icons'
 import * as React from 'react';
 
 export interface Props {
@@ -71,7 +71,7 @@ export default class PageButtonGroup extends Component<Props, State> {
             onChange={this.onPageChange}>
             <ToggleButton
                 value={-3}>
-                <FontAwesomeIcon icon={faChevronDoubleLeft} />
+                <FontAwesomeIcon icon={faStepBackward} />
             </ToggleButton>
             <ToggleButton
                 value={-1}>
@@ -87,7 +87,7 @@ export default class PageButtonGroup extends Component<Props, State> {
             </ToggleButton>
             <ToggleButton
                 value={-4}>
-                <FontAwesomeIcon icon={faChevronDoubleRight} />
+                <FontAwesomeIcon icon={faStepForward} />
             </ToggleButton>
         </ToggleButtonGroup>
     }

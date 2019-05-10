@@ -9,7 +9,7 @@ import { Table, Row, Col, Container, ButtonToolbar } from 'react-bootstrap';
 
 import PageButtonGroup from './PageButtonGroup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSortUp, faSortDown } from '@fortawesome/pro-solid-svg-icons';
+import { faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons';
 
 export enum SortDirection {
   ascending, descending
