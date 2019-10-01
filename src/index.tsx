@@ -18,16 +18,18 @@ export enum SortDirection {
 export interface ColumnDefintion {
   key: string
   displayName: string
-  formatter?: (value: any, row: any) => any
+  formatter?: (value: any, key: string, row: any) => any
   width: string
   sortable: boolean
   sorter: (value: any) => number
   headerStyle: any,
-  cellStyle: any
+  cellStyle: any,
+  colSpan: number
 }
 
 export interface PagingOptions {
   sizes: number[]
+  enabled: boolean
 }
 export interface Props {
   columns: ColumnDefintion[]
@@ -37,8 +39,11 @@ export interface Props {
   clickable: boolean
   onSortChange?: (key: string, sortBy: SortDirection) => {}
   onRowClicked?: (id: string | number) => {}
+  onColumnRefs?: (refs: { [key: string]: React.RefObject<HTMLTableDataCellElement>; }) => void
   bordered: boolean
   noDataElement: JSX.Element
+  containerStyle: React.CSSProperties | undefined
+  showHeader: boolean
 }
 export interface State {
   currentPage: number
@@ -66,8 +71,12 @@ export default class SimpleTable extends React.Component<Props, State> {
   static defaultProps = {
     idKey: "id",
     clickable: false,
-    pagingOptions: { sizes: [10, 20, 30] }
+    pagingOptions: { sizes: [10, 20, 30] },
+    showHeader: true
   }
+
+  public tdRefs: { [key: string]: React.RefObject<HTMLTableDataCellElement>; } = {}
+
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -121,6 +130,12 @@ export default class SimpleTable extends React.Component<Props, State> {
 
   }
 
+  componentDidMount() {
+    if (this.props.onColumnRefs) {
+      this.props.onColumnRefs(this.tdRefs)
+    }
+  }
+
   onColumnClicked = (key: string, shouldSort: boolean) => {
     if (!shouldSort) {
       console.log("Not sorting", key, shouldSort)
@@ -154,9 +169,10 @@ export default class SimpleTable extends React.Component<Props, State> {
         {rowObj.injectAbove}
         <tr className={!this.props.clickable ? "no-hover" : ""} key={key} onClick={() => (this.props.clickable && this.props.onRowClicked && this.props.onRowClicked(key))}>
           {this.props.columns.map(column => {
+
             let columnData = rowObj[column.key];
             if (column.formatter) {
-              columnData = column.formatter(columnData, rowObj)
+              columnData = column.formatter(columnData, column.key, rowObj)
             } else {
               if (columnData instanceof Function) {
                 columnData = rowObj[column.key]()
@@ -164,7 +180,9 @@ export default class SimpleTable extends React.Component<Props, State> {
                 columnData = columnData.toString()
               }
             }
-            return <td style={{ ...column.cellStyle }} key={column.key}>{columnData}</td>;
+            const tdRef = React.createRef<HTMLTableDataCellElement>();
+            this.tdRefs[column.key] = tdRef;
+            return <td ref={tdRef} style={{ ...column.cellStyle }} key={column.key}>{columnData}</td>;
           })}
         </tr>
         {rowObj.injectBelow}
@@ -174,8 +192,8 @@ export default class SimpleTable extends React.Component<Props, State> {
       tableBody.push(this.props.noDataElement)
     }
     return (
-      <Container fluid={true}>
-        {numberOfPages > 1 && <Row>
+      <Container fluid={true} {...{ style: this.props.containerStyle }}>
+        {numberOfPages > 1 && this.props.pagingOptions.enabled && <Row>
           <Col md={12}>
             {"Showing "}
             <select onChange={this.onPageSizeChange}>
@@ -193,7 +211,7 @@ export default class SimpleTable extends React.Component<Props, State> {
         <Row>
           <Col md={12}>
             <Table bordered={this.props.bordered} responsive hover={this.props.clickable}>
-              <thead>
+              {this.props.showHeader && <thead>
                 <tr className="no-hover">
                   {this.props.columns.map(column => {
                     const sortDirection = this.state.sorting.get(column.key);
@@ -205,7 +223,9 @@ export default class SimpleTable extends React.Component<Props, State> {
                     if (sortDirection == undefined) {
                       showSort = false;
                     }
-                    return <th className={column.sortable ? "clickableColumn" : ""}
+                    return <th
+                      {...column.colSpan}
+                      className={column.sortable ? "clickableColumn" : ""}
                       key={column.key}
                       style={{ ...column.headerStyle }}
                       onClick={() => { this.onColumnClicked(column.key, column.sortable) }}>
@@ -218,7 +238,7 @@ export default class SimpleTable extends React.Component<Props, State> {
                     </th>
                   })}
                 </tr>
-              </thead>
+              </thead>}
               <tbody>
                 {this.props.children}
                 {tableBody}
@@ -226,7 +246,7 @@ export default class SimpleTable extends React.Component<Props, State> {
             </Table>
           </Col>
         </Row>
-        {numberOfPages > 1 && <Row className="float-right">
+        {numberOfPages > 1 && this.props.pagingOptions.enabled && <Row className="float-right">
 
           <Col md={12}>
             <ButtonToolbar>
